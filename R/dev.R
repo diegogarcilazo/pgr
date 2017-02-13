@@ -1,0 +1,8 @@
+library(devtools)
+devtools::document()
+devtools::use_package('RPostgreSQL')
+devtools::use_package('lazyeval')
+devtools::use_package('readxl')
+devtools::use_package('foreign')
+devtools::use_package('dplyr')
+

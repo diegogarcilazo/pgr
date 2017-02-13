@@ -1,11 +1,17 @@
 Package: pgr
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Title: Set of wrapper functions to work with PostgreSQL.
+Version: 0.0.9001
+Author: Diego Augusto Garcilazo
+Maintainer: Diego Augusto Garcilazo <dgarcilazo@anlis.gov.ar>
+Description: Main goal is to make connection, import, export with PostgreSQL easier. This package uses others to fulfill its goal in a simple way.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports:
+    RPostgreSQL,
+    lazyeval,
+    readxl,
+    foreign,
+    dplyr
+RoxygenNote: 5.0.1
