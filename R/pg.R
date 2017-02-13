@@ -1,3 +1,6 @@
+library(devtools)
+
+
 #' @importFrom magrittr %>%
 pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost'){
   if(dbname == 'NULL') stop('No database name');
@@ -11,7 +14,7 @@ pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost'){
 #' Connection to postgresql via RPostgreSQL. The password is entered by .rs.askForPassword().
 #' @param dbname: database name.
 #' @param user: user name. Default(postgres).
-#' @param host: host. Default(localhost). 
+#' @param host: host. Default(localhost).
 
 pg_con = function(dbname = NULL, user = postgres, host = localhost){
   dbname = deparse(substitute(dbname));
@@ -36,7 +39,7 @@ pg_src_ <- function(
 #' Connection to postgresql via dplyr. The password is entered by .rs.askForPassword().
 #' @param dbname: database name.
 #' @param user: user name. Default(postgres).
-#' @param host: host. Default(localhost). 
+#' @param host: host. Default(localhost).
 
 pg_src <- function(
   dbname = NULL, host = localhost, port = 5432, user = postgres) {
@@ -109,7 +112,7 @@ pg_dplyr_tbl <- function(
 
 pg_export = function(con,query,dir = file.choose(new = T), encoding = 'WIN1252', delimiter = '\t'){
   RPostgreSQL::dbSendQuery(con,
-                           paste0("SET client_encoding TO '", 
+                           paste0("SET client_encoding TO '",
                                   encoding,
                                   "'; COPY (",
                                   query,
@@ -176,7 +179,7 @@ pg_importxl_ <- function(
 #' @param file: path excel file.
 #' @param sheet: excel sheet where is the table.
 #' @param schema: name of schema to write.
-#' @param table: table name. 
+#' @param table: table name.
 #' @param col_types: chr Either NULL to guess from the spreadsheet or a character vector containing "blank", "numeric", "date" or "text".
 
 pg_importxl <- function(
@@ -203,7 +206,7 @@ pg_importdbf_ <- function(file = file.choose(), con, schema = 'public', table_na
 #' @param con: Pg connection.
 #' @param schema: name of schema to write.
 #' @param table_name: table name.
-#' 
+#'
 pg_importdbf <- function(file = file.choose(), con, schema = 'public', table_name){
   pg_importdbf_(file, con, deparse(substitute(schema)), deparse(substitute(table_name)))}
 
@@ -252,8 +255,8 @@ pg_save <- function(df, con, schema, table_name, overwrite = FALSE, append = FAL
 }
 
 pg_save_ <- function(df, con, schema = 'public', table_name, overwrite = FALSE, append = FALSE){
-  RPostgreSQL::dbWriteTable(con, 
-                            c(schema, table_name), 
+  RPostgreSQL::dbWriteTable(con,
+                            c(schema, table_name),
                             value = df ,row.names = F, overwrite = overwrite, append = append);
 }
 
@@ -316,7 +319,7 @@ pg_action_ <- function(pg_schema_list, action = 'view'){
   con <- pg_schema_list[['connection']];
   schema <- pg_schema_list[['schema']];
   selectedTable <- pg_schema_list[['selectedTable']];
-  
+
   switch(action,
          'view' = {
            tbl<-pg_tbl_(con, selectedTable)
@@ -324,13 +327,13 @@ pg_action_ <- function(pg_schema_list, action = 'view'){
          },
          'clip' = {
            message('Schema and table name copied to clipboard');
-           writeClipboard(paste0(schema,'.',selectedTable));  
+           writeClipboard(paste0(schema,'.',selectedTable));
          },
          'read' = {
-           return(pg_read_(con, schema, selectedTable));  
+           return(pg_read_(con, schema, selectedTable));
          },
          'first' = {
-    return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))  
+    return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))
   })
 }
 #'Summary of schema. Additionaly if use first and second arguments read table or view.
@@ -339,8 +342,8 @@ pg_action_ <- function(pg_schema_list, action = 'view'){
 #'@param schema: schema.
 #'@param first: int 1 = Tables. 2 = Views.
 #'@param second: int with table or view position.
-#'@param to_clip: logical if TRUE copies to clipboard 
-#' 
+#'@param to_clip: logical if TRUE copies to clipboard
+#'
 pg_schema <-function(con, schema, first = NULL, second = NULL){
   pg_schema_(con, deparse(substitute(schema)), first, second);
 }
@@ -357,7 +360,7 @@ pg_action.pg_table <- function(pg_table, action = view){
 pg_table <- function(con, schema, table){
  schema = deparse(substitute(schema))
  table = deparse(substitute(table))
- 
+
  table <- list(con, schema, table);
  class(table) <- 'pg_table'
   return(
@@ -377,12 +380,12 @@ pg_action2_ <- function(pg_table, action = 'view'){
          },
          'clip' = {
            message('Schema and table name copied to clipboard');
-           writeClipboard(paste0(schema,'.',selectedTable));  
+           writeClipboard(paste0(schema,'.',selectedTable));
          },
          'read' = {
-           return(pg_read_(con, schema, selectedTable));  
+           return(pg_read_(con, schema, selectedTable));
          },
          'first' = {
-           return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))  
+           return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))
          })
 }
