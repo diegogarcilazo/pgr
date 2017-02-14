@@ -11,7 +11,6 @@ pg_tbl <- function(con, a){
   pg_tbl_(con, deparse(substitute(a)));
 }
 
-
 pg_sql = function(con, a){
   RPostgreSQL::dbGetQuery(con, a, stringsAsFactors = F)}
 pg_schemas <- function(con){
