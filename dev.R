@@ -1,5 +1,6 @@
 library(devtools)
 devtools::document()
+devtools::create('pgr')
 devtools::use_package('RPostgreSQL')
 devtools::use_package('lazyeval')
 devtools::use_package('readxl')

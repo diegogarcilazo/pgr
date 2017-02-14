@@ -6,3 +6,6 @@ tradu_colnames <- function(datos){
   names(datos) <- cols;
   return(datos);
 }
+
+
+library(myutilities)

@@ -1,3 +1,6 @@
+
+#' @exportPattern ^[[:alpha:]]+
+#' @importFrom magrittr %>%
 pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost'){
   if(dbname == 'NULL') stop('No database name');
   password = .rs.askForPassword(paste('Password for user', user));
