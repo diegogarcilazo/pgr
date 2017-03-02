@@ -56,7 +56,13 @@ pg_dplyr_ <- function(pg_src, schema = 'public', table){
   return(dplyr::tbl(query_4dplyr, src = pg_src));
 }
 
-pg_dplyr <- function(pg_src, schema, table){
+
+#' Connection to postgresql via dplyr. The password is entered by .rs.askForPassword().
+#' @param pg_src: postgresql connection.
+#' @param schema: schema name. Default(public).
+#' @param table: table name.
+#'
+pg_dplyr <- function(pg_src, schema = public, table){
   schema = deparse(substitute(schema));
   table = deparse(substitute(table));
   return(pg_dplyr_(pg_src, schema, table));
