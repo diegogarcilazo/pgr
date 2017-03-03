@@ -40,7 +40,7 @@ pg_importxl_ <- function(
   new_colnames <- pg_col4pg(datos);
   colnames(datos) <- new_colnames;
   valor <- pg_save_(datos, con, schema = schema, table_name = table);
-  return(ifelse(valor == T, 'Loaded. OK.','Error'))
+  return(ifelse(valor == T, 'Writed on postgresql: OK.','Writed on postgresql: Error'))
 }
 
 #' Read tabular data in excel file (xls or xlsx) and write it in PostgreSQL.
