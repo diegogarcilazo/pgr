@@ -5,7 +5,7 @@ Version: 0.0.9002
 Author: Diego Augusto Garcilazo
 Maintainer: Diego Augusto Garcilazo <dgarcilazo@anlis.gov.ar>
 Description: Main goal is to make connection, import, export with PostgreSQL easier. This package uses others to fulfill its goal in a simple way.
-License: What license is it under?
+License: GPL v3
 Encoding: UTF-8
 LazyData: true
 Imports:
