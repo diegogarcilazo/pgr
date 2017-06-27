@@ -18,4 +18,3 @@ pg_importdbf(file = file.choose(), con, schema = "public", table_name)
 \description{
 Read tabular data in dbf file and write it in PostgreSQL.
 }
-
