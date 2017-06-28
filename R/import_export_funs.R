@@ -93,9 +93,9 @@ pg_save <- function(df, con, schema, table_name, overwrite = FALSE, append = FAL
   pg_save_(df, con, schema, table_name, overwrite, append);
 }
 
-pg_save_ <- function(df, con, schema = 'public', table_name, overwrite = FALSE, append = FALSE){
+pg_save_ <- function(df, con, schema = 'public', table_name, overwrite = FALSE, append = FALSE, temporary = F){
   DBI::dbWriteTable(con,
                             c(schema, table_name),
-                            value = df ,row.names = F, overwrite = overwrite, append = append);
+                            value = df ,row.names = F, overwrite = overwrite, append = append, temporary = temporary);
 }
 
