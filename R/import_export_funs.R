@@ -86,14 +86,17 @@ pg_importdbf <- function(file = file.choose(), con, schema = 'public', table_nam
 #' @param schema: schema name.
 #' @param table_name: name that will have table.
 #' @param df: data.frame to save.
+#' @param overwrite:
+#' @param append;
+#' @param temporary:
 
-pg_save <- function(df, con, schema, table_name, overwrite = FALSE, append = FALSE){
+pg_save <- function(df, con, schema, table_name, overwrite = FALSE, append = FALSE, temporary = FALSE){
   schema = deparse(substitute(schema));
   table_name = deparse(substitute(table_name));
-  pg_save_(df, con, schema, table_name, overwrite, append);
+  pg_save_(df, con, schema, table_name, overwrite, append, temporary);
 }
 
-pg_save_ <- function(df, con, schema = 'public', table_name, overwrite = FALSE, append = FALSE, temporary = F){
+pg_save_ <- function(df, con, schema = 'public', table_name, overwrite = FALSE, append = FALSE, temporary = FALSE){
   DBI::dbWriteTable(con,
                             c(schema, table_name),
                             value = df ,row.names = F, overwrite = overwrite, append = append, temporary = temporary);
