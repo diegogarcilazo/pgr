@@ -28,6 +28,22 @@ pg_read <- function(con, schema, table_name){
   pg_read_(con, schema, table_name)
 }
 
+
+#' Connect to several tables from db using dplyr
+#' @param db chr database name
+#' @param schema chr schema name. Default 'public'.
+#' @param tbls chr or vector of chrs with table names.
+#' @param host chr. Defaulta 'localhost'.
+#'
+
+pg_readb <- function(db = NULL, schema = 'public', tbls = NULL, host = 'localhost'){
+  con <- pgr::pg_con_(db, host = host);
+  listOfTbls <- purrr::map(tbls, function(x) dplyr::tbl(con, dbplyr::in_schema(schema, x)));
+  names(listOfTbls) <- tbls
+  return(listOfTbls)
+}
+
+
 pg_importxl_ <- function(
   con,
   file = file.choose(),

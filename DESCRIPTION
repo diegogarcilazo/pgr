@@ -1,7 +1,7 @@
 Package: pgr
 Type: Package
 Title: Set of wrapper functions to work with PostgreSQL.
-Version: 0.0.9004
+Version: 0.0.9005
 Author: Diego Augusto Garcilazo
 Maintainer: Diego Augusto Garcilazo <dgarcilazo@anlis.gov.ar>
 Description: Main goal is to make connection, import, export with PostgreSQL easier. This package uses others to fulfill its goal in a simple way.
@@ -12,5 +12,8 @@ Imports:
     RPostgreSQL,
     readxl,
     foreign,
-    DBI
+    DBI,
+    dbplyr,
+    dplyr,
+    purrr
 RoxygenNote: 6.0.1
