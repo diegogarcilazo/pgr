@@ -37,12 +37,12 @@ pg_read <- function(con, schema, table_name){
 #'
 
 pg_readb <- function(db = NULL, schema = 'public', tbls = NULL, host = 'localhost'){
+  stopifnot(!is.null(db));
   con <- pgr::pg_con_(db, host = host);
   listOfTbls <- purrr::map(tbls, function(x) dplyr::tbl(con, dbplyr::in_schema(schema, x)));
   names(listOfTbls) <- tbls
   return(listOfTbls)
 }
-
 
 pg_importxl_ <- function(
   con,
