@@ -11,7 +11,7 @@ pg_readb(db = NULL, schema = "public", tbls = NULL, host = "localhost")
 
 \item{schema}{chr schema name. Default 'public'.}
 
-\item{tbls}{chr or vector of chrs with table names.}
+\item{tbls}{chr or vector of chrs with table names. Default all tables.}
 
 \item{host}{chr. Defaulta 'localhost'.}
 }

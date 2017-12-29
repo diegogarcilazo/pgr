@@ -22,3 +22,12 @@ pg_con = function(dbname = NULL, user = postgres, host = localhost){
           user = user,
           host = host)
 }
+
+#' Disconnect all connections available
+#'
+pg_disconnect_all <- function()
+{
+  all_cons <- DBI::dbListConnections(RPostgreSQL::PostgreSQL())
+  walk(all_cons, DBI::dbDisconnect)
+
+}
