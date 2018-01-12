@@ -5,8 +5,9 @@
 #' @param encoding: (chr) SET client_encoding to. Default 'WIN1252'.
 #' @param delimiter: (chr) Set delimiter. Default tabular.
 
+
 pg_export = function(con,query,dir = file.choose(new = T), encoding = 'WIN1252', delimiter = '\t'){
-  RPostgreSQL::dbSendQuery(con,
+  DBI::dbSendQuery(con,
                            paste0("SET client_encoding TO '",
                                   encoding,
                                   "'; COPY (",
@@ -19,7 +20,7 @@ pg_export = function(con,query,dir = file.choose(new = T), encoding = 'WIN1252',
 
 
 pg_read_ <- function(con, schema, table_name){
-  RPostgreSQL::dbReadTable(con, c(schema,table_name))
+  DBI::dbReadTable(con, c(schema,table_name))
 }
 
 pg_read <- function(con, schema, table_name){
@@ -112,9 +113,9 @@ pg_importdbf <- function(file = file.choose(), con, schema = 'public', table_nam
 #' @param schema: schema name.
 #' @param table_name: name that will have table.
 #' @param df: data.frame to save.
-#' @param overwrite:
-#' @param append;
-#' @param temporary:
+#' @param overwrite: Overwrite table.
+#' @param append: Append table
+#' @param temporary: Create temporary
 
 pg_save <- function(df, con, schema, table_name, overwrite = FALSE, append = FALSE, temporary = FALSE){
   schema = deparse(substitute(schema));

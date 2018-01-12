@@ -15,6 +15,12 @@ pg_save(df, con, schema, table_name, overwrite = FALSE, append = FALSE,
 \item{table_name:}{name that will have table.}
 
 \item{df:}{data.frame to save.}
+
+\item{overwrite:}{Overwrite table.}
+
+\item{append:}{Append table}
+
+\item{temporary:}{Create temporary}
 }
 \description{
 Save data.frame into Postgresql

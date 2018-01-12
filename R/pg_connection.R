@@ -1,7 +1,7 @@
 pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost'){
   if(dbname == 'NULL') stop('No database name');
   password = rstudioapi::askForPassword(paste('Password for user', user));
-  DBI::dbConnect(RPostgreSQL::PostgreSQL(),
+  DBI::dbConnect(RPostgres::Postgres(),
                          dbname = dbname,
                          user = user,
                          host = host,
@@ -27,7 +27,7 @@ pg_con = function(dbname = NULL, user = postgres, host = localhost){
 #'
 pg_disconnect_all <- function()
 {
-  all_cons <- DBI::dbListConnections(RPostgreSQL::PostgreSQL())
+  all_cons <- DBI::dbListConnections(RPostgre::Postgre())
   walk(all_cons, DBI::dbDisconnect)
 
 }

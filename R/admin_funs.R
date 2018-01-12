@@ -12,7 +12,7 @@ pg_tbl <- function(con, a){
 }
 
 pg_sql = function(con, a){
-  RPostgreSQL::dbGetQuery(con, a, stringsAsFactors = F)}
+  DBI::dbGetQuery(con, a, stringsAsFactors = F)}
 pg_schemas <- function(con){
   schemas <- pg_sql(con,
                     'select schemaname, count(*) n_tables  from pg_tables group by 1 order by 1');
