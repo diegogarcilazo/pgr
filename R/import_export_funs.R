@@ -30,25 +30,30 @@ pg_read <- function(con, schema, table_name){
 }
 
 
-#' Connect to several tables from db using dplyr
+#' Connect to several tables from schema of db using dplyr
 #' @param db chr database name
 #' @param schema chr schema name. Default 'public'.
 #' @param tbls chr or vector of chrs with table names. Default all tables.
 #' @param host chr. Defaulta 'localhost'.
 #'
 
-pg_readb <- function(db = NULL, schema = 'public', tbls = NULL, host = 'localhost'){
+pg_readtbls <- function(db = NULL, schema = 'public', tbls = NULL, host = 'localhost')
+  {
 
   stopifnot(!is.null(db));
 
   con <- pgr::pg_con_(db, host = host);
 
-  tbls <- DBI::dbGetQuery(con,"SELECT table_schema, table_name, table_type  FROM information_schema.tables
+  all_tbls <- DBI::dbGetQuery(con,"SELECT table_schema, table_name, table_type
+FROM information_schema.tables
                 WHERE NOT table_schema IN ('pg_catalog','information_schema')")
 
-  if(is.null(tbls)){tbls <- tbls[tbls$table_schema==schema, ];}
+  if(is.null(tbls)){tbls <- subset(all_tbls, table_schema==schema);} else {
 
-  listOfTbls <- purrr::map2(tbls$table_schema, tbls$table_name, ~ dplyr::tbl(con, dbplyr::in_schema(.x, .y)));
+    tbls <- subset(all_tbls, table_schema==schema & table_name%in%tbls);}
+
+  listOfTbls <- purrr::map2(tbls$table_schema, tbls$table_name,
+                            ~ dplyr::tbl(con, dbplyr::in_schema(.x, .y)));
 
   names(listOfTbls) <- paste(tbls$table_schema, tbls$table_name, sep = '.')
 
@@ -103,8 +108,10 @@ pg_importdbf_ <- function(file = file.choose(), con, schema = 'public', table_na
 #' @param schema: name of schema to write.
 #' @param table_name: table name.
 #'
-pg_importdbf <- function(file = file.choose(), con, schema = 'public', table_name){
-  pg_importdbf_(file, con, deparse(substitute(schema)), deparse(substitute(table_name)))}
+pg_importdbf <- function(file = file.choose(), con, schema = 'public', table_name)
+{
+  pg_importdbf_(file, con, deparse(substitute(schema)),
+                deparse(substitute(table_name)))}
 
 
 
