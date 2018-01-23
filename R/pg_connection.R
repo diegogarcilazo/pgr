@@ -19,7 +19,7 @@ pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost', driver 
 #' @param host: host. Default(localhost).
 #' @param driver: switch from Postgres to PostgreSQL
 
-pg_con = function(dbname = NULL, user = postgres, host = localhost, driver = RPostgres){
+pg_con = function(dbname = NULL, user = postgres, host = localhost, driver = Postgres){
   dbname = deparse(substitute(dbname));
   user = deparse(substitute(postgres));
   host = deparse(substitute(localhost));
