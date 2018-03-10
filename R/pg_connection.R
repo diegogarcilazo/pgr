@@ -5,11 +5,12 @@ pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost', driver 
     'PostgreSQL' = {driver <- RPostgreSQL::PostgreSQL()}
   );
   password = rstudioapi::askForPassword(paste('Password for user', user));
-  DBI::dbConnect(drv = driver,
+  con <- DBI::dbConnect(drv = driver,
                          dbname = dbname,
                          user = user,
                          host = host,
                          password = password)
+
 }
 
 

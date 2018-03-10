@@ -5,7 +5,7 @@
 \title{Export query to CSV with delimiter tabular and header.}
 \usage{
 pg_export(con, query, dir = file.choose(new = T), encoding = "WIN1252",
-  delimiter = "\\t")
+  delim = "\\t")
 }
 \arguments{
 \item{con:}{connection.}
@@ -16,7 +16,7 @@ pg_export(con, query, dir = file.choose(new = T), encoding = "WIN1252",
 
 \item{encoding:}{(chr) SET client_encoding to. Default 'WIN1252'.}
 
-\item{delimiter:}{(chr) Set delimiter. Default tabular.}
+\item{delim:}{(chr) Set delimiter. Default tabular.}
 }
 \description{
 Export query to CSV with delimiter tabular and header.

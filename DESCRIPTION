@@ -16,5 +16,6 @@ Imports:
     DBI (>= 0.7),
     dbplyr (>= 1.2),
     dplyr (>= 0.7),
-    purrr (>= 0.2)
+    purrr (>= 0.2),
+    glue (>= 1.2)
 RoxygenNote: 6.0.1

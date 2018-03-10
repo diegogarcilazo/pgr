@@ -1,146 +1,132 @@
-pg_nomcols = function(con, a){
-  nomcols<-pg_sql(con, paste0("SELECT column_name, data_type FROM information_schema.columns WHERE table_name ='",a,"'"));
-  return(nomcols);
-}#NOMBRE DE LAS COLUMNAS Y TIPO DE DATO a(character): Nombre de la tabla
+#' column name and data type from tbl.
+#' @param con: Conection.
+#' @param tbl: chr table name.
 
-pg_tbl_ = function(con, a) {
-  tbl <- pg_sql(con, paste0("SELECT a.attnum, a.attname AS CAMPO, t.typname AS tipo, a.attlen AS length, a.atttypmod AS lengthvar, a.attnotnull AS notnull FROM pg_class c, pg_attribute a, pg_type t WHERE c.relname = '", a, "' and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid ORDER BY a.attnum;"));
-  return(tbl)}#DESCRIBE LA TABLA a(character): nombre de la tabla
+pg_nomcols = function(con, tbl){
+  pgr::pg_sql(con,
+                  glue::glue_sql(
+                    "SELECT column_name, data_type
+                       FROM information_schema.columns
+                        WHERE table_name = {tbl}", .con = con));
+  }
 
-pg_tbl <- function(con, a){
-  pg_tbl_(con, deparse(substitute(a)));
-}
 
-pg_sql = function(con, a){
-  DBI::dbGetQuery(con, a, stringsAsFactors = F)}
+#' Summarise information about a tbl
+#' @param con: DBI connection.
+#' @param tbl: chr. tbl name.
+#'
+pg_tbl = function(con, tbl) {
+
+  atts <- pgr::pg_sql(con,
+               glue::glue_sql("SELECT relname, reltuples, (relpages * 8) / 2^10 mb
+                                FROM pg_class
+                                  WHERE relname = {tbl}", .con = con))
+
+  cat('Table name:', tbl,'\tsize:', round(atts$mb), 'mb', '\trows:',atts$reltuples)
+  cat('\n')
+  pg_sql(con,
+      glue::glue_sql("SELECT a.attnum, a.attname AS CAMPO, t.typname AS tipo,
+                              a.attlen AS length, a.atttypmod AS lengthvar,
+                               a.attnotnull AS notnull
+                        FROM pg_class c, pg_attribute a, pg_type t
+                         WHERE c.relname = {tbl} AND a.attnum > 0
+                                  AND a.attrelid = c.oid AND a.atttypid = t.oid
+                          ORDER BY a.attnum;", .con = con))
+    }
+
+
+
+#' Send query and return data.frame.
+#' @param con: conection.
+#' @param query: sql query.
+
+pg_sql <- function(con, query){
+    DBI::dbGetQuery(con, query, stringsAsFactors = F)
+  }
+
+
+#' Show schemas information from database
+#' @param con: DBI connection.
+#'
+
 pg_schemas <- function(con){
-  schemas <- pg_sql(con,
-                    'select schemaname, count(*) n_tables  from pg_tables group by 1 order by 1');
-  return(invisible(schemas));
-}
 
-pg_tables_ <- function(con, schema){
-  tables <- pg_sql(con, paste0("select tablename  from pg_tables where schemaname = '",schema,"' order by 1"));
-  return(tables);
-}
+dt <- "SELECT n.nspname as schema, reltuples,relpages,
+c.relname as name,
+  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' END as type,
+  pg_catalog.pg_get_userbyid(c.relowner) as owner
+  FROM pg_catalog.pg_class c
+  LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+  WHERE c.relkind IN ('r','','v')
+  AND n.nspname <> 'pg_catalog'
+  AND n.nspname <> 'information_schema'
+  AND n.nspname !~ '^pg_toast'
+  ORDER BY 1,2;"
+
+tbls_info <- pgr::pg_sql(con, dt)
+
+schemas <- tbls_info %>%
+               mutate(
+                  size_Tbl_MBytes = round((relpages * 8) / 2^10, 1)
+                  ) %>%
+                 group_by(schema) %>%
+                   summarise(n_tables = sum(type == 'table'),
+                             n_views = sum(type == 'view'),
+                             tbls_size_MBytes = round(sum(size_Tbl_MBytes)))
+
+cat('Database: \n')
+print(con)
+cat('\n')
+as.data.frame(schemas);
+
+  }
+
+#' Table information from schema
+#' @param con: DBI conection.
+#' @param schema: chr. schema name.
+#'
 
 pg_tables <- function(con, schema){
-  pg_tables_(con, deparse(substitute(schema)));
+
+  dt <- glue::glue("SELECT n.nspname as schema, reltuples,relpages,
+c.relname as name,
+  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' END as type,
+  pg_catalog.pg_get_userbyid(c.relowner) as owner
+  FROM pg_catalog.pg_class c
+  LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = '{schema}'
+  ORDER BY 1,2;")
+
+pgr::pg_sql(con, dt) %>%
+    transmute(
+      type,
+      name,
+      owner,
+      rows = reltuples,
+      size_mb = round((relpages * 8) / 2^10)
+    ) %>% arrange(type, name) %>% filter(type %in% c('table','view'))
 }
 
-pg_views_ <- function(con, schema){
-  views <-pg_sql(con, paste0("select table_name from INFORMATION_SCHEMA.views WHERE table_schema = '", schema, "' ORDER BY 1"));
-  return(views);
-}
-
-pg_views <- function(con, schema){
-  pg_views_(con, deparse(substitute(schema)))
-}
 
 pg_view_def <- function(con, view){
-  def <-pg_sql(con, paste0("select view_definition from INFORMATION_SCHEMA.views WHERE table_name = '", view, "' ORDER BY 1"));
-  return(def);
+  pg_sql(con,
+      glue::glue_sql("SELECT view_definition
+                        FROM INFORMATION_SCHEMA.views
+                          WHERE table_name = {view}
+                            ORDER BY 1", .con = con))
 }
 
-pg_schema_ <-function(con, schema, first = NULL, second = NULL){
-  conn <- con;
-  tables <-pg_tables_(con,schema);
-  views <- pg_views_(con,schema);
-  l <- list(tables = tables, views = views);
-  if(!is.null(first) & !is.null(second)){
-    selectedTable <-l[[first]][second,];
-    list_1 <- list(selectedTable = selectedTable, connection = conn, schema = schema);
-    class(list_1) <- 'schema_list';
-    message(paste('Selected table:',selectedTable,'from',schema))
-    return(invisible(list_1))}
-  if(is.null(first) | is.null(second)){
-    cat(
-      paste(
-        "The schema",
-        schema,
-        "have:\n Tables:\n"));
-    print(tables);
-    cat(
-      paste(
-        "Views:\n"));
-    print(views);
-  }
-}
 
-pg_action <- function(x, ...) UseMethod('pg_action',x)
-
-pg_action_ <- function(pg_schema_list, action = 'view'){
-  con <- pg_schema_list[['connection']];
-  schema <- pg_schema_list[['schema']];
-  selectedTable <- pg_schema_list[['selectedTable']];
-
-  switch(action,
-         'view' = {
-           tbl<-pg_tbl_(con, selectedTable)
-           return(tbl);
-         },
-         'clip' = {
-           message('Schema and table name copied to clipboard');
-           writeClipboard(paste0(schema,'.',selectedTable));
-         },
-         'read' = {
-           return(pg_read_(con, schema, selectedTable));
-         },
-         'first' = {
-           return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))
-         })
-}
-#'Summary of schema. Additionaly if use first and second arguments read table or view.
+#' Show information about, schema and table depend on arguments presents.
+#' @param con: DBI connection.
+#' @param schema: chr. Schema name.
+#' @param table: chr. Table name.
 #'
-#'@param con: pg connection.
-#'@param schema: schema.
-#'@param first: int 1 = Tables. 2 = Views.
-#'@param second: int with table or view position.
-#'@param to_clip: logical if TRUE copies to clipboard
-#'
-pg_schema <-function(con, schema, first = NULL, second = NULL){
-  pg_schema_(con, deparse(substitute(schema)), first, second);
-}
 
-pg_action.schema_list <- function(pg_schema_list, action = view){
-  pg_action_(pg_schema_list, deparse(substitute(action)))
-}
+pg_show <- function(con, schema = NULL, table = NULL){
 
-
-pg_action.pg_table <- function(pg_table, action = view){
-  pg_action2_(pg_table, action = deparse(substitute(view)))
-}
-
-pg_table <- function(con, schema, table){
-  schema = deparse(substitute(schema))
-  table = deparse(substitute(table))
-
-  table <- list(con, schema, table);
-  class(table) <- 'pg_table'
-  return(
-    invisible(table)
-  )
-}
-
-pg_action2_ <- function(pg_table, action = 'view'){
-
-  con <- pg_table[[1]];
-  schema <- pg_table[[2]];
-  selectedTable <- pg_table[[3]];
-  switch(action,
-         'view' = {
-           tbl<-pg_tbl_(con, selectedTable)
-           return(tbl);
-         },
-         'clip' = {
-           message('Schema and table name copied to clipboard');
-           writeClipboard(paste0(schema,'.',selectedTable));
-         },
-         'read' = {
-           return(pg_read_(con, schema, selectedTable));
-         },
-         'first' = {
-           return(pg_sql(con, paste0("SELECT * FROM ",schema, ".",selectedTable, " LIMIT 10")))
-         })
+  if(is.null(schema) & is.null(table)){return(pg_schemas(con))}
+  if(!is.null(schema) & is.null(table)){return(pg_tables(con, schema))}
+  if(!is.null(schema) & !is.null(table)){return(pg_tbl(con, table))}
 }
 

@@ -3,20 +3,14 @@
 #' @param query: (chr) SQL query.
 #' @param dir: (chr) directory. Default(file.choose()).
 #' @param encoding: (chr) SET client_encoding to. Default 'WIN1252'.
-#' @param delimiter: (chr) Set delimiter. Default tabular.
+#' @param delim: (chr) Set delimiter. Default tabular.
 
 
-pg_export = function(con,query,dir = file.choose(new = T), encoding = 'WIN1252', delimiter = '\t'){
-  DBI::dbSendQuery(con,
-                           paste0("SET client_encoding TO '",
-                                  encoding,
-                                  "'; COPY (",
-                                  query,
-                                  ") TO '",
-                                  dir ,
-                                  "' WITH DELIMITER E'",
-                                  delimiter,
-                                  "'CSV HEADER;"))}
+pg_export = function(con,query,dir = file.choose(new = T), encoding = 'WIN1252', delim = '\t')
+  {
+  DBI::dbSendQuery(con, glue::glue("SET client_encoding TO {encoding};"))
+  DBI::dbSendQuery(con, glue::glue("COPY ({query}) TO '{dir}' WITH DELIMITER E'{delim}' CSV HEADER;"))
+  }
 
 
 pg_read_ <- function(con, schema, table_name){
@@ -35,7 +29,6 @@ pg_read <- function(con, schema, table_name){
 #' @param schema chr schema name. Default 'public'.
 #' @param tbls chr or vector of chrs with table names. Default all tables.
 #' @param host chr. Defaulta 'localhost'.
-#'
 
 pg_readtbls <- function(db = NULL, schema = 'public', tbls = NULL, host = 'localhost')
   {
