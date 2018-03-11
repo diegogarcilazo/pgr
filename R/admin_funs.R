@@ -24,7 +24,7 @@ pg_tbl = function(con, tbl) {
 
   cat('Table name:', tbl,'\tsize:', round(atts$mb), 'mb', '\trows:',atts$reltuples)
   cat('\n')
-  pg_sql(con,
+  pgr::pg_sql(con,
       glue::glue_sql("SELECT a.attnum, a.attname AS CAMPO, t.typname AS tipo,
                               a.attlen AS length, a.atttypmod AS lengthvar,
                                a.attnotnull AS notnull
@@ -66,11 +66,11 @@ c.relname as name,
 tbls_info <- pgr::pg_sql(con, dt)
 
 schemas <- tbls_info %>%
-               mutate(
+               dplyr::mutate(
                   size_Tbl_MBytes = round((relpages * 8) / 2^10, 1)
                   ) %>%
-                 group_by(schema) %>%
-                   summarise(n_tables = sum(type == 'table'),
+  dplyr::group_by(schema) %>%
+  dplyr::summarise(n_tables = sum(type == 'table'),
                              n_views = sum(type == 'view'),
                              tbls_size_MBytes = round(sum(size_Tbl_MBytes)))
 
@@ -98,18 +98,18 @@ c.relname as name,
   ORDER BY 1,2;")
 
 pgr::pg_sql(con, dt) %>%
-    transmute(
+  dplyr::transmute(
       type,
       name,
       owner,
       rows = reltuples,
       size_mb = round((relpages * 8) / 2^10)
-    ) %>% arrange(type, name) %>% filter(type %in% c('table','view'))
+    ) %>% dplyr::arrange(type, name) %>% dplyr::filter(type %in% c('table','view'))
 }
 
 
 pg_view_def <- function(con, view){
-  pg_sql(con,
+  pgr::pg_sql(con,
       glue::glue_sql("SELECT view_definition
                         FROM INFORMATION_SCHEMA.views
                           WHERE table_name = {view}
