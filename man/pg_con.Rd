@@ -4,15 +4,17 @@
 \alias{pg_con}
 \title{Connection to postgresql via RPostgreSQL. The password is entered by .rs.askForPassword().}
 \usage{
-pg_con(dbname = NULL, user = postgres, host = localhost,
-  driver = Postgres)
+pg_con(dbname = NULL, user = postgres, host = "localhost",
+  port = "5432", driver = Postgres)
 }
 \arguments{
 \item{dbname:}{database name.}
 
-\item{user:}{user name. Default(postgres).}
+\item{user:}{user name. Default postgres.}
 
-\item{host:}{host. Default(localhost).}
+\item{host:}{chr. Default 'localhost'.}
+
+\item{port:}{chr. Default '5432'}
 
 \item{driver:}{switch from Postgres to PostgreSQL}
 }

@@ -20,8 +20,9 @@ pg_con_ = function(dbname = NULL, user = 'postgres', host = 'localhost', port = 
 
 #' Connection to postgresql via RPostgreSQL. The password is entered by .rs.askForPassword().
 #' @param dbname: database name.
-#' @param user: user name. Default(postgres).
-#' @param host: host. Default(localhost).
+#' @param user: user name. Default postgres.
+#' @param host: chr. Default 'localhost'.
+#' @param port: chr. Default '5432'
 #' @param driver: switch from Postgres to PostgreSQL
 
 pg_con = function(dbname = NULL, user = postgres, host = 'localhost', port = '5432', driver = Postgres){
@@ -35,8 +36,6 @@ pg_con = function(dbname = NULL, user = postgres, host = 'localhost', port = '54
           driver = driver)
 }
 
-
-pg_con(fibrosisquistica, host = '192.168.0.204')
 
 #' Disconnect all connections available
 #'
