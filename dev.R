@@ -1,9 +1,11 @@
 devtools::document()
+devtools::use_testthat()
+devtools::use_package('R6')
 
-devtools::use_package('magrittr')
+con = pgr::pg_con(mdb1252, driver = Postgres)
 
-con = pgr::pg_con(mdb1252, driver = PostgreSQL)
 
-library(tidyverse)
 
-pg_show(con,'codigos','localidad')
+con <- PgCon$new('mdb1252')
+
+con$import('mortalidad.paisde15')
