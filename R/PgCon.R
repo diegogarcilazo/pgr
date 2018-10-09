@@ -23,7 +23,7 @@ PgCon <- R6::R6Class("PgCon",
                                                        password = rstudioapi::askForPassword(paste('Password for user', self$user)))
 
                          DBI::dbSendQuery(self$pg_con, glue::glue("SET client_encoding TO {self$client_encoding};"))
-                         cat(print(self))
+                         cat(self$print())
                        },
                        print = function(){
                          glue::glue("<{self$name}>
