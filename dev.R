@@ -8,4 +8,14 @@ con <- PgCon$new('mdb1252')
 
 con$import('codigos.deptos_er')
 
+con$addValue_client_encoding <- "UTF8"
+
+rm(con)
+
 con$disconnect()
+
+DBI::dbListConnections(drv = RPostgreSQL::PostgreSQL())
+
+DBI::dbDisconnect()
+
+gc()

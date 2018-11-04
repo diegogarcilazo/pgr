@@ -1,6 +1,21 @@
 #' R6 Class PyCon postgresql connection.
 
 PgCon <- R6::R6Class("PgCon",
+
+
+                     active = list(
+
+                       addValue_client_encoding = function(value){
+
+                         if(missing(value)){
+                           private$set_client_encoding()}
+                         else{
+                             self$client_encoding <- value
+                             private$set_client_encoding()
+                           }
+                       }
+                     ),
+
                      public = list(
                        name = NULL,
                        user = NULL,
@@ -8,13 +23,16 @@ PgCon <- R6::R6Class("PgCon",
                        port = NULL,
                        driver = NULL,
                        pg_con = NULL,
-                       client_encoding = "UTF8",
-                       initialize = function(name, user = 'postgres', host = 'localhost', port = '5432', driver = RPostgreSQL::PostgreSQL()){
+                       client_encoding = NULL,
+
+                       initialize = function(name, user = 'postgres', host = 'localhost', port = '5432',
+                                             driver = RPostgreSQL::PostgreSQL(), client_encoding = "UTF8"){
                          self$name <- name
                          self$user <- user
                          self$host <- host
                          self$port <- port
                          self$driver <- driver
+                         self$client_encoding <- client_encoding
                          self$pg_con <- DBI::dbConnect(drv = self$driver,
                                                        dbname = self$name,
                                                        user = self$user,
@@ -22,26 +40,43 @@ PgCon <- R6::R6Class("PgCon",
                                                        port = self$port,
                                                        password = rstudioapi::askForPassword(paste('Password for user', self$user)))
 
-                         DBI::dbSendQuery(self$pg_con, glue::glue("SET client_encoding TO {self$client_encoding};"))
-                         cat(self$print())
+                         private$set_client_encoding()
+                         print(self$print())
                        },
+
+                       finalize = function() {
+
+                         message("Cleaning up connection")
+                         self$disconnect()
+
+                         },
+
                        print = function(){
-                         glue::glue("<{self$name}>
+                         invisible(
+
+                           glue::glue("<{self$name}>
                                           user: {self$user}
                                           host: {self$host}
                                           port: {self$port}
                                           client encoding: {self$client_encoding}
                                     ")
+
+                         )
+
+
                        },
 
-                       import = function(query){
+
+                       import = function(sql_obj){
                          start <- Sys.time()
-                         if(grepl('(SELECT|INSERT|UPDATE)(?:.+)(FROM)', toupper(query))){
-                           .tibble <- tibble::as_tibble(DBI::dbGetQuery(self$pg_con, query, stringsAsFactors = F))
+                         if(grepl('(SELECT)(?:.+)(FROM)', toupper(sql_obj))){
+                           obj <- "SQL query:"
+                           .tibble <- tibble::as_tibble(DBI::dbGetQuery(self$pg_con, sql_obj, stringsAsFactors = F))
                          }else{
-                           .tibble <- tibble::as_tibble(DBI::dbReadTable(self$pg_con, strsplit(query,"\\.")[[1]]))}
+                           obj <- "Table:"
+                           .tibble <- tibble::as_tibble(DBI::dbReadTable(self$pg_con, strsplit(sql_obj,"\\.")[[1]]))}
                          end <- Sys.time()
-                         cat(paste('\nImport time:', round(end-start,2), "sec\n"))
+                         cat(glue::glue('Import {obj} {sql_obj} \ntime: {round(end-start,2)} sec\n\n'))
                          return(.tibble)
                        },
 
@@ -52,5 +87,11 @@ PgCon <- R6::R6Class("PgCon",
 
                        disconnect = function() {DBI::dbDisconnect(self$pg_con)}
 
-                     )
+                     ),
+
+                    private = list(
+                      set_client_encoding = function(){
+                        DBI::dbSendQuery(self$pg_con, glue::glue("SET client_encoding TO {self$client_encoding};"))
+                      }
+                    )
 )
