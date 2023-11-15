@@ -26,7 +26,7 @@ PgCon <- R6::R6Class("PgCon",
                        client_encoding = NULL,
 
                        initialize = function(name, user = 'postgres', host = 'localhost', port = '5432',
-                                             driver = RPostgreSQL::PostgreSQL(), client_encoding = "UTF8"){
+                                             driver = RPostgres::Postgres(), client_encoding = "UTF8"){
                          self$name <- name
                          self$user <- user
                          self$host <- host

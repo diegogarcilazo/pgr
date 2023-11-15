@@ -1,7 +1,8 @@
 devtools::document()
-devtools::use_testthat()
+usethis::use_testthat()
+devtools::test()
 devtools::use_package('R6')
-
+usethis::use_test()
 con = pgr::pg_con(mdb1252, driver = Postgres)
 
 con <- PgCon$new('mdb1252')
