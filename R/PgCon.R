@@ -81,7 +81,8 @@ PgCon <- R6::R6Class("PgCon",
                        },
 
                        export = function(df, schema = 'public', table_name, overwrite = FALSE, append = FALSE, temporary = FALSE){
-                         DBI::dbWriteTable(conn = self$pg_con, name = c(schema, table_name),
+                         DBI::dbWriteTable(conn = self$pg_con,
+                                           name = RPostgres::Id(schema = schema, table = table_name),
                                            value = df ,row.names = F, overwrite = overwrite, append = append, temporary = temporary);
                        },
 

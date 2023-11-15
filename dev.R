@@ -7,6 +7,8 @@ con = pgr::pg_con(mdb1252, driver = Postgres)
 
 con <- PgCon$new('mdb1252')
 
+con$export(tibble::tibble(a = 1:4), table_name = "prueba")
+
 con$import('codigos.deptos_er')
 
 con$addValue_client_encoding <- "UTF8"
@@ -20,3 +22,7 @@ DBI::dbListConnections(drv = RPostgreSQL::PostgreSQL())
 DBI::dbDisconnect()
 
 gc()
+
+dbplyr::copy_to(con,
+                   tibble::tibble(a = 1:5),
+                   dbplyr::in_schema("public", "sales"))
