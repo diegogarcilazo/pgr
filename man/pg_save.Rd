@@ -4,8 +4,15 @@
 \alias{pg_save}
 \title{Save data.frame into Postgresql}
 \usage{
-pg_save(df, con, schema, table_name, overwrite = FALSE, append = FALSE,
-  temporary = FALSE)
+pg_save(
+  df,
+  con,
+  schema,
+  table_name,
+  overwrite = FALSE,
+  append = FALSE,
+  temporary = FALSE
+)
 }
 \arguments{
 \item{con:}{pg connection.}

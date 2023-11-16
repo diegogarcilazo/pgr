@@ -4,8 +4,13 @@
 \alias{pg_con}
 \title{Connection to postgresql via RPostgreSQL. The password is entered by .rs.askForPassword().}
 \usage{
-pg_con(dbname = NULL, user = postgres, host = "localhost",
-  port = "5432", driver = Postgres)
+pg_con(
+  dbname = NULL,
+  user = postgres,
+  host = "localhost",
+  port = "5432",
+  driver = Postgres
+)
 }
 \arguments{
 \item{dbname:}{database name.}

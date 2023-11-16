@@ -58,22 +58,35 @@ PgCon <- R6::R6Class("PgCon",
       start <- Sys.time()
 
       if (grepl("(SELECT)(?:.+)(FROM)", toupper(sql_obj))) {
+
         obj <- "SQL query:"
+
         .tibble <- tibble::as_tibble(
           DBI::dbGetQuery(self$pg_con, sql_obj, stringsAsFactors = F))
+      } else if(grepl("\\/", toupper(sql_obj))){
+
+        query <- readr::read_file(sql_obj)
+
+        obj <- "SQL file:"
+        .tibble <- tibble::as_tibble(
+          DBI::dbGetQuery(self$pg_con, query, stringsAsFactors = F))
       } else {
 
         obj <- "Table:"
 
         tbl_loc <- purrr::set_names(
-          x = strsplit(sql_obj, "\\.")[[1]],
-          nm = c("schema", "table"))
+            x = strsplit(sql_obj, "\\.")[[1]],
+            nm = c("schema", "table"))
 
-        .tibble <- tibble::as_tibble(
-          DBI::dbReadTable(self$pg_con, RPostgres::Id(tbl_loc)))
-      }
+          .tibble <- tibble::as_tibble(
+            DBI::dbReadTable(self$pg_con, RPostgres::Id(tbl_loc)))
+
+        }
+
       end <- Sys.time()
+
       cat(glue::glue("Import {obj} {sql_obj} \ntime: {round(end-start,2)} sec\n\n"))
+
       return(.tibble)
     },
 

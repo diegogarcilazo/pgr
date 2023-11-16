@@ -4,8 +4,7 @@
 \alias{pg_readtbls}
 \title{Connect to several tables from schema of db using dplyr}
 \usage{
-pg_readtbls(db = NULL, schema = "public", tbls = NULL,
-  host = "localhost")
+pg_readtbls(db = NULL, schema = "public", tbls = NULL, host = "localhost")
 }
 \arguments{
 \item{db}{chr database name}
