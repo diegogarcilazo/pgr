@@ -92,8 +92,14 @@ PgCon <- R6::R6Class("PgCon",
 
     disconnect = function() {
       DBI::dbDisconnect(self$pg_con)
+    },
+
+    describeTable = function(table_name) {
+      pgr::pg_tbl(self$pg_con, table_name)
     }
-  ),
+
+  ), # <End Public Methods and Properties>
+
   private = list(
     set_client_encoding = function() {
       DBI::dbSendQuery(self$pg_con, glue::glue("SET client_encoding TO {self$client_encoding};"))
