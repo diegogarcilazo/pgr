@@ -13,6 +13,17 @@ con$import('codigos.deptos_er')
 
 con$addValue_client_encoding <- "UTF8"
 
+
+tbl_loc <- purrr::set_names(
+  x = strsplit('codigos.deptos_er', "\\.")[[1]],
+  nm = c("schema", "table"))
+
+a <- paste0(tbl_loc, collapse = ".")
+
+DBI::dbReadTable(con$pg_con, RPostgres::Id(tbl_loc))
+
+
+
 rm(con)
 
 con$disconnect()
